@@ -1,0 +1,54 @@
+{
+  "name": "knowledge-check",
+  "title": "Knowledge check",
+  "description": "Allow players to learn about their encounter, inspired by twitch dnd streamer Arcadum", 
+  "authors": [
+    {
+      "name": "TPNils"
+    }
+  ],
+  "version": "1.0.0",
+  "minimumCoreVersion": "0.7.9",
+  "compatibleCoreVersion": "0.7.9",
+  "manifestPlusVersion": "1.0.0",
+  "url": "",
+  "manifest": "",
+  "download": "",
+  "type": "module",
+  "includes": [
+    "./assets/**",
+    "./lang/**",
+    "./scripts/**",
+    "./styles/**",
+    "./templates/**",
+    "./module.json",
+    "./README.md"
+  ],
+  "media": [
+    {
+      "type": "icon",
+      "location": ""
+    }, 
+    {
+      "type": "cover",
+      "location": ""
+    },
+    {
+      "type": "screenshot",
+      "location": ""
+    }
+  ],
+  "esmodules": [
+    "scripts/module.js"
+  ],
+  "styles": [
+    "styles/module.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ]
+}
