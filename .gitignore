@@ -18,8 +18,3 @@
 !/src/packs
 !/src/scripts
 !/src/templates
-
-# Gulp only processes and copies .ts files from the scripts folder
-!/src/styles
-/src/scripts/*
-!/src/scripts/*.ts
