@@ -11,6 +11,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # Install dependancies from NPM
+    - name: Install dependancies
+      shell: bash
+      id: install-dependancies
+      run: npm i
+
     # Get the name from 'module.json'
     - name: Build
       shell: bash
