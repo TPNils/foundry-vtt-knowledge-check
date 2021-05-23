@@ -23,7 +23,7 @@ export class HookManager {
 
   private static ready(): void {
     // Add a listener to detect clicking on the checkbox input
-    document.querySelector('#chat').addEventListener('change', event => {
+    document.querySelector('#chat').addEventListener('change', async event => {
       if (event.target instanceof HTMLInputElement) {
         if (event.target.classList.contains('knowledge-check') && event.target.classList.contains('identifiable')) {
           let actorId: string;
@@ -49,14 +49,27 @@ export class HookManager {
           if (!actorId || !ownedItemId || !messageId) {
             return;
           }
+
+          const item = game.actors.get(actorId).items.get(ownedItemId);
+          const message = game.messages.get(messageId);
+
+          console.log({
+            item: item.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER),
+            message: message.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER)
+          })
+          if (!item.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER) || !message.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER)) {
+            event.target.checked = false;
+            ui.notifications.error('Insufficient permissions');
+            return;
+          }
   
           event.target.setAttribute('checked', "");
           messageRoot.querySelectorAll('input').forEach(element => {
             element.disabled = true;
           });
   
-          SystemManager.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
-          ChatMessage.update({
+          await SystemManager.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
+          await ChatMessage.update({
             _id: messageId,
             content: messageRoot.querySelector('.message-content').innerHTML
           });
