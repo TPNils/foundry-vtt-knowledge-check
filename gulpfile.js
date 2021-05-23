@@ -127,6 +127,7 @@ function getCopyGlobs(destinationPrefix) {
     {from: 'README.md', into: `${destinationPrefix}/`},
     {from: 'src/module.json', into: `${destinationPrefix}/`},
     {from: 'src/lang/**', into: `${destinationPrefix}/lang/`},
+    {from: 'src/packs/**', into: `${destinationPrefix}/packs/`},
     {from: 'src/templates/**', into: `${destinationPrefix}/templates/`},
     {from: 'src/styles/**', into: `${destinationPrefix}/styles/`},
     {from: 'src/assets/*', into: `${destinationPrefix}/assets/`}

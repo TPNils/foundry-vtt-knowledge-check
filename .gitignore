@@ -13,7 +13,9 @@
 /src/*
 # Gulp copies these files
 !/src/module.json
+!/src/assets
 !/src/lang
+!/src/packs
 !/src/scripts
 !/src/templates
 

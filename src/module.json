@@ -18,11 +18,20 @@
   "includes": [
     "./assets/**",
     "./lang/**",
+    "./packs/**",
     "./scripts/**",
     "./styles/**",
     "./templates/**",
     "./module.json",
     "./README.md"
+  ],
+	"packs": [
+		{
+			"name": "knowledge-macros",
+			"label": "Knowledge macros",
+			"path": "packs/macros.db",
+			"entity": "Macro"
+    }
   ],
   "media": [
     {
