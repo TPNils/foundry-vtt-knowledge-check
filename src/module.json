@@ -39,10 +39,9 @@
     }
   ],
   "esmodules": [
-    "scripts/module.js"
+    "scripts/main.js"
   ],
   "styles": [
-    "styles/module.css"
   ],
   "languages": [
     {
