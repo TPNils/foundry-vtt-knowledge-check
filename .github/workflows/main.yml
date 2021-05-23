@@ -27,7 +27,7 @@ jobs:
     - name: Package
       shell: bash
       id: package
-      run: npm run build
+      run: npm run package
 
     #Useful only for the template so we can leave the manifest and download urls empty
     - name: Substitute Manifest and Download Links For Versioned Ones
