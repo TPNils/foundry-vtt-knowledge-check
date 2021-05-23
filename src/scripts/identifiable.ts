@@ -10,7 +10,7 @@ export interface IdentifiableAbility {
 
 export class Identifiable {
 
-  public static isIdentifiable(item: Item<any>): boolean {
+  public isIdentifiable(item: Item<any>): boolean {
     const isIdentifiable = item.getFlag(staticValues.moduleName, 'identifiable');
     if (isIdentifiable == null) {
       // fallback for dnd5e
@@ -49,11 +49,11 @@ export class Identifiable {
     }
   }
 
-  public static isManuallySet(item: Item<any>): boolean {
+  public isManuallySet(item: Item<any>): boolean {
     return item.getFlag(staticValues.moduleName, 'identifiable') == null;
   }
 
-  public static async setIdentifiable(item: Item<any>, value: boolean | null): Promise<void> {
+  public async setIdentifiable(item: Item<any>, value: boolean | null): Promise<void> {
     if (value == null) {
       await item.unsetFlag(staticValues.moduleName, 'identifiable');
     } else {
@@ -65,12 +65,12 @@ export class Identifiable {
       const isRevealed = item.getFlag(staticValues.moduleName, 'revealed');
       console.log(isRevealed);
       if (isRevealed != null) {
-        await Identifiable.setRevealed(item, null);
+        await this.setRevealed(item, null);
       }
     }
   }
 
-  public static isRevealed(item: Item<any>): boolean {
+  public isRevealed(item: Item<any>): boolean {
     const isRevealed = item.getFlag(staticValues.moduleName, 'revealed');
     
     switch (typeof isRevealed) {
@@ -91,7 +91,7 @@ export class Identifiable {
     }
   }
 
-  public static async setRevealed(item: Item<any>, value: boolean | null): Promise<void> {
+  public async setRevealed(item: Item<any>, value: boolean | null): Promise<void> {
     if (value == null) {
       await item.unsetFlag(staticValues.moduleName, 'revealed');
     } else {
@@ -99,11 +99,11 @@ export class Identifiable {
     }
   }
 
-  public static async getAbilitiesHtml(actorId: string): Promise<string> {
+  public async getAbilitiesHtml(actorId: string): Promise<string> {
     const actor = game.actors.get(actorId);
   
     const identifiableAbilities: IdentifiableAbility[] = Array.from(actor.items)
-      .filter(item => Identifiable.isIdentifiable(item))
+      .filter(item => this.isIdentifiable(item))
       .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
       .map((item: Item<any>) => {
         return {
@@ -111,7 +111,7 @@ export class Identifiable {
           ownedItemId: item.id,
           name: item.name,
           img: item.img,
-          revealed: Identifiable.isRevealed(item)
+          revealed: this.isRevealed(item)
         }
       });
   
@@ -120,9 +120,9 @@ export class Identifiable {
     }) as any);
   }
   
-  public static async printAbilities(actorId: string): Promise<void> {
+  public async printAbilities(actorId: string): Promise<void> {
     const actor = game.actors.get(actorId);
-    const htmlTemplate: string = await Identifiable.getAbilitiesHtml(actorId);
+    const htmlTemplate: string = await this.getAbilitiesHtml(actorId);
   
     return await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({actor: actor}),

@@ -1,5 +1,5 @@
-import { Identifiable } from "./identifiable.js";
 import { staticValues } from "./static-values.js";
+import { SystemManager } from "./system-manager.js";
 
 interface ItemSheetHeaderButton {
   class: string;
@@ -17,7 +17,7 @@ export class HookManager {
 
   private static init(): void {
     game[staticValues.moduleName] = {
-      printAbilities: Identifiable.printAbilities
+      printAbilities: (actorId: string) => SystemManager.getIdentifiable().printAbilities(actorId)
     };
   }
 
@@ -55,7 +55,7 @@ export class HookManager {
             element.disabled = true;
           });
   
-          Identifiable.setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
+          SystemManager.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
           ChatMessage.update({
             _id: messageId,
             content: messageRoot.querySelector('.message-content').innerHTML
@@ -76,7 +76,7 @@ export class HookManager {
       icon: HookManager.getItemSheetHeaderButtonIcon(item),
       label: 'Identifiable',
       onclick: async () => {
-        await Identifiable.setIdentifiable(item, !Identifiable.isIdentifiable(item));
+        await SystemManager.getIdentifiable().setIdentifiable(item, !SystemManager.getIdentifiable().isIdentifiable(item));
         document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable i`).forEach(icon => {
           icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
         });
@@ -88,7 +88,7 @@ export class HookManager {
       document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable:not(.${staticValues.moduleName}-has-context-listener)`).forEach(element => {
         element.classList.add(`${staticValues.moduleName}-has-context-listener`);
         element.addEventListener('contextmenu', async () => {
-          await Identifiable.setIdentifiable(item, null);
+          await SystemManager.getIdentifiable().setIdentifiable(item, null);
           element.querySelectorAll(`:scope i`).forEach(icon => {
             icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
           });
@@ -98,10 +98,10 @@ export class HookManager {
   }
 
   private static getItemSheetHeaderButtonIcon(item: Item<any>): string {
-    if (Identifiable.isManuallySet(item)) {
-      return Identifiable.isIdentifiable(item) ? 'fas fa-check' : 'fas fa-times';
+    if (SystemManager.getIdentifiable().isManuallySet(item)) {
+      return SystemManager.getIdentifiable().isIdentifiable(item) ? 'fas fa-check' : 'fas fa-times';
     } else {
-      return Identifiable.isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
+      return SystemManager.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
     }
   }
 
