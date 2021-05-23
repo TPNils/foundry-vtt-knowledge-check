@@ -1,10 +1,9 @@
 name: Module CI/CD
 
-# TODO enable
-# on: 
-#   push:
-#     branches:
-#       - master
+on: 
+  push:
+    branches:
+      - master
 
 jobs: 
   build:
