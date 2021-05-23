@@ -2,9 +2,9 @@
   class="knowledge-check identifiable-abilities"
   style="display: grid; grid-template-columns: max-content auto max-content; align-items: baseline;">
   {{#each items as |itemData key|}}
-    <img src="{{itemData.img}}" style="width: 30px; height: 30px; margin-right: 4px;"/>
+    <img src="{{itemData.img}}" style="width: 30px; height: 30px; margin-right: 4px; align-self: center;"/>
     <div style="flex-grow: 1;">{{itemData.name}}</div>
-    <label style="align-items: center; display: flex; {{#if itemData.revealed}}color: green;{{else}}color: red; cursor: pointer;{{/if}}" data-actor-id="{{itemData.actorId}}" data-owned-item-id="{{itemData.ownedItemId}}">
+    <label style="align-items: center; display: flex; align-self: center; {{#if itemData.revealed}}color: green;{{else}}color: red; cursor: pointer;{{/if}}" data-actor-id="{{itemData.actorId}}" data-owned-item-id="{{itemData.ownedItemId}}">
       <input class="knowledge-check identifiable" type="checkbox" {{#if itemData.revealed}}checked disabled{{/if}}/>
       {{#if itemData.revealed}}
         revealed
