@@ -11,22 +11,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    # Get the version from 'module.json'
-    - name: Get Version
-      shell: bash
-      id: get-version
-      run: echo "::set-output name=version::$(node ./.github/workflows/get-version.js)"
-
     # Get the name from 'module.json'
-    - name: Get Includes
+    - name: Build
       shell: bash
-      id: get-includes
-      run: echo "::set-output name=files::$(node ./.github/workflows/get-includes.js)"
+      id: build
+      run: npm run build
 
     # create a zip file with all files required by the module to add to the release
-    - name: Zip Files
-      working-directory: ./dist #SORRY BUT YOU HAVE TO USE DIST JUST LIKE GET OVER IT OR FIGURE OUT A BETTER WAY
-      run: zip -r ../module.zip ${{steps.get-includes.outputs.files}}
+    - name: Package
+      shell: bash
+      id: package
+      run: npm run build
 
     #Useful only for the template so we can leave the manifest and download urls empty
     - name: Substitute Manifest and Download Links For Versioned Ones
