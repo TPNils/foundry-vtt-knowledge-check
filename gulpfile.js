@@ -325,11 +325,11 @@ async function packageBuild() {
 	return new Promise((resolve, reject) => {
 		try {
 			// Ensure there is a directory to hold all the packaged versions
-			fs.ensureDirSync('dist');
+			fs.ensureDirSync('package');
 
 			// Initialize the zip file
 			const zipName = `module.zip`;
-			const zipFile = fs.createWriteStream(path.join('dist', zipName));
+			const zipFile = fs.createWriteStream(path.join('package', zipName));
 			const zip = archiver('zip', { zlib: { level: 9 } });
 
 			zipFile.on('close', () => {
