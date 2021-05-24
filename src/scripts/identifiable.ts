@@ -6,6 +6,8 @@ export interface IdentifiableAbility {
   name: string;
   img: string;
   revealed: boolean;
+  checked: boolean;
+  disabled: boolean;
 }
 
 export class Identifiable {
@@ -63,7 +65,6 @@ export class Identifiable {
     // Reset reveal, a 'it works well enough' solution to allow to reset something that was revealed
     if (!value) {
       const isRevealed = item.getFlag(staticValues.moduleName, 'revealed');
-      console.log(isRevealed);
       if (isRevealed != null) {
         await this.setRevealed(item, null);
       }
@@ -99,30 +100,35 @@ export class Identifiable {
     }
   }
 
-  public async getAbilitiesHtml(actorId: string): Promise<string> {
+  public getAbilitiesFromActor(actorId: string): IdentifiableAbility[] {
     const actor = game.actors.get(actorId);
-  
-    const identifiableAbilities: IdentifiableAbility[] = Array.from(actor.items)
-      .filter(item => this.isIdentifiable(item))
-      .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
-      .map((item: Item<any>) => {
-        return {
-          actorId: actorId,
-          ownedItemId: item.id,
-          name: item.name,
-          img: item.img,
-          revealed: this.isRevealed(item)
-        }
-      });
-  
+
+    return Array.from(actor.items)
+    .filter(item => this.isIdentifiable(item))
+    .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
+    .map((item: Item<any>) => {
+      const isRevealed = this.isRevealed(item);
+      return {
+        actorId: actorId,
+        ownedItemId: item.id,
+        name: item.name,
+        img: item.img,
+        revealed: isRevealed,
+        checked: isRevealed,
+        disabled: isRevealed,
+      }
+    });
+  }
+
+  public async getAbilitiesHtml(abilities: IdentifiableAbility[]): Promise<string> {
     return await (renderTemplate(`modules/${staticValues.moduleName}/templates/identifiable-abilities.hbs`, {
-      items: identifiableAbilities
+      items: abilities
     }) as any);
   }
   
-  public async printAbilities(actorId: string): Promise<void> {
+  public async printAbilities(actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
     const actor = game.actors.get(actorId);
-    const htmlTemplate: string = await this.getAbilitiesHtml(actorId);
+    const htmlTemplate: string = await this.getAbilitiesHtml(overrides.abilities ? overrides.abilities : this.getAbilitiesFromActor(actorId));
   
     return await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({actor: actor}),
@@ -130,6 +136,15 @@ export class Identifiable {
       type: CONST.CHAT_MESSAGE_TYPES.OTHER,
       user: game.userId
     }).then(() => null);
+  }
+
+  public async updateAbilityMessage(messageId: string, actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
+    const htmlTemplate: string = await this.getAbilitiesHtml(overrides.abilities ? overrides.abilities : this.getAbilitiesFromActor(actorId));
+
+    await ChatMessage.update({
+      _id: messageId,
+      content: htmlTemplate
+    });
   }
 
 }

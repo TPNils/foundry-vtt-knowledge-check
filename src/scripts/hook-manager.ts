@@ -53,26 +53,24 @@ export class HookManager {
           const item = game.actors.get(actorId).items.get(ownedItemId);
           const message = game.messages.get(messageId);
 
-          console.log({
-            item: item.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER),
-            message: message.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER)
-          })
           if (!item.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER) || !message.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER)) {
             event.target.checked = false;
             ui.notifications.error('Insufficient permissions');
             return;
           }
   
-          event.target.setAttribute('checked', "");
-          messageRoot.querySelectorAll('input').forEach(element => {
-            element.disabled = true;
-          });
+          const abilities = SystemManager.getIdentifiable().getAbilitiesFromActor(actorId);
+          for (const ability of abilities) {
+            ability.disabled = true;
+            if (ability.ownedItemId === ownedItemId) {
+              ability.checked = true;
+              // Do not set as revealed,
+              // checked but not revealed implies that the user selected it in that message
+            }
+          }
   
           await SystemManager.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
-          await ChatMessage.update({
-            _id: messageId,
-            content: messageRoot.querySelector('.message-content').innerHTML
-          });
+          await SystemManager.getIdentifiable().updateAbilityMessage(messageId, actorId, {abilities: abilities});
         }
       }
   
