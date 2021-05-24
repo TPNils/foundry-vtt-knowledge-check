@@ -142,13 +142,27 @@ export class Identifiable {
   public async printAbilities(actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
     const actor = game.actors.get(actorId);
     const htmlTemplate: string = await this.getAbilitiesHtml(overrides.abilities ? overrides.abilities : this.getAbilitiesFromActor(actorId));
-  
-    return await ChatMessage.create({
+
+    const message = await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({actor: actor}),
       content: htmlTemplate,
       type: CONST.CHAT_MESSAGE_TYPES.OTHER,
       user: game.userId
-    }).then(() => null);
+    });
+  
+    return new Promise(resolve => {
+      if (game.user.hasRole(CONST.USER_ROLES.GAMEMASTER)) {
+        // Allow GM to 'un reveal' abilities
+        setTimeout(() => {
+          document.querySelectorAll(`[data-message-id="${message.id}"] .message-content input`).forEach((input: HTMLInputElement) => {
+            input.disabled = false;
+          })
+          resolve(null);
+        }, 0);
+      } else {
+        resolve(null);
+      }
+    });
   }
 
   public async updateAbilityMessage(messageId: string, actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {

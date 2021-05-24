@@ -55,7 +55,7 @@ export class HookManager {
           for (const ability of abilities) {
             ability.disabled = true;
             if (ability.ownedItemId === ownedItemId) {
-              ability.checked = true;
+              ability.checked = event.target.checked;
               // Do not set as revealed,
               // checked but not revealed implies that the user selected it in that message
             }
