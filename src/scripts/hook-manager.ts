@@ -61,8 +61,8 @@ export class HookManager {
             }
           }
   
-          await provider.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
-          await provider.getIdentifiable().updateAbilityMessage(messageId, actorId, {abilities: abilities});
+          provider.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), event.target.checked);
+          provider.getIdentifiable().updateAbilityMessage(messageId, actorId, {abilities: abilities});
         }
       }
   
