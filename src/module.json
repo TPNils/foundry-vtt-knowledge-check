@@ -11,6 +11,7 @@
   "minimumCoreVersion": "0.7.9",
   "compatibleCoreVersion": "0.7.9",
   "manifestPlusVersion": "1.0.0",
+  "socket": true,
   "url": "",
   "manifest": "",
   "download": "",
@@ -31,6 +32,12 @@
 			"label": "Knowledge macros",
 			"path": "packs/macros.db",
 			"entity": "Macro"
+    }
+  ],
+  "dependencies": [
+    {
+      "name": "socketlib",
+      "manifest": "https://raw.githubusercontent.com/manuelVo/foundryvtt-socketlib/master/module.json"
     }
   ],
   "media": [

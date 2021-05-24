@@ -1,4 +1,6 @@
+import { provider } from "./provider.js";
 import { staticValues } from "./static-values.js";
+import { ValueProvider } from "./value-provider.js";
 
 export interface IdentifiableAbility {
   actorId: string;
@@ -11,6 +13,11 @@ export interface IdentifiableAbility {
 }
 
 export class Identifiable {
+
+  public registerSocket(socket: SocketlibSocket): void {
+    socket.register('updateAbilityMessage', this.updateAbilityMessageLocal.bind(this));
+    socket.register('setRevealed', this.setRevealedLocal.bind(this));
+  }
 
   public isIdentifiable(item: Item<any>): boolean {
     const isIdentifiable = item.getFlag(staticValues.moduleName, 'identifiable');
@@ -93,10 +100,16 @@ export class Identifiable {
   }
 
   public async setRevealed(item: Item<any>, value: boolean | null): Promise<void> {
+    const socket = await provider.getSocket();
+    return await socket.executeAsGM('setRevealed', item.actor.id, item.id, value);
+  }
+
+  private async setRevealedLocal(actorId: string, itemId: string, value: boolean | null): Promise<void> {
+    const item = game.actors.get(actorId).items.get(itemId);
     if (value == null) {
       await item.unsetFlag(staticValues.moduleName, 'revealed');
     } else {
-      await item.setFlag(staticValues.moduleName, 'revealed', value);
+      //await item.setFlag(staticValues.moduleName, 'revealed', value);
     }
   }
 
@@ -139,12 +152,23 @@ export class Identifiable {
   }
 
   public async updateAbilityMessage(messageId: string, actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
+    this.updateAbilityMessageLocal(messageId, actorId, overrides, true);
+    const socket = await provider.getSocket();
+    return await socket.executeAsGM('updateAbilityMessage', messageId, actorId, overrides, false);
+  }
+
+  private async updateAbilityMessageLocal(messageId: string, actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}, htmlOnly: boolean): Promise<void> {
     const htmlTemplate: string = await this.getAbilitiesHtml(overrides.abilities ? overrides.abilities : this.getAbilitiesFromActor(actorId));
 
-    await ChatMessage.update({
-      _id: messageId,
-      content: htmlTemplate
-    });
+    if (htmlOnly) {
+      document.querySelector(`[data-message-id="${messageId}"] .message-content`).innerHTML = htmlTemplate;
+    } else {
+      await ChatMessage.update({
+        _id: messageId,
+        content: htmlTemplate
+      });
+    }
+
   }
 
 }

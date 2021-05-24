@@ -1,5 +1,5 @@
 import { staticValues } from "./static-values.js";
-import { SystemManager } from "./system-manager.js";
+import { provider } from "./provider.js";
 
 interface ItemSheetHeaderButton {
   class: string;
@@ -13,11 +13,12 @@ export class HookManager {
     Hooks.on('getItemSheetHeaderButtons', (...args: any) => HookManager.getItemSheetHeaderButtons(args[0], args[1]));
     Hooks.on('init', () => HookManager.init());
     Hooks.on('ready', () => HookManager.ready());
+    Hooks.once("socketlib.ready", () => HookManager.socketlibReady());
   }
 
   private static init(): void {
     game[staticValues.moduleName] = {
-      printAbilities: (actorId: string) => SystemManager.getIdentifiable().printAbilities(actorId)
+      printAbilities: (actorId: string) => provider.getIdentifiable().printAbilities(actorId)
     };
   }
 
@@ -49,17 +50,8 @@ export class HookManager {
           if (!actorId || !ownedItemId || !messageId) {
             return;
           }
-
-          const item = game.actors.get(actorId).items.get(ownedItemId);
-          const message = game.messages.get(messageId);
-
-          if (!item.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER) || !message.hasPerm(game.user, CONST.ENTITY_PERMISSIONS.OWNER)) {
-            event.target.checked = false;
-            ui.notifications.error('Insufficient permissions');
-            return;
-          }
   
-          const abilities = SystemManager.getIdentifiable().getAbilitiesFromActor(actorId);
+          const abilities = provider.getIdentifiable().getAbilitiesFromActor(actorId);
           for (const ability of abilities) {
             ability.disabled = true;
             if (ability.ownedItemId === ownedItemId) {
@@ -69,12 +61,16 @@ export class HookManager {
             }
           }
   
-          await SystemManager.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
-          await SystemManager.getIdentifiable().updateAbilityMessage(messageId, actorId, {abilities: abilities});
+          await provider.getIdentifiable().setRevealed(game.actors.get(actorId).items.get(ownedItemId), true);
+          await provider.getIdentifiable().updateAbilityMessage(messageId, actorId, {abilities: abilities});
         }
       }
   
     })
+  }
+
+  private static socketlibReady(): void {
+    provider.setSocket(socketlib.registerModule(staticValues.moduleName));
   }
 
   private static getItemSheetHeaderButtons(app: any, buttons: ItemSheetHeaderButton[]): void {
@@ -87,7 +83,7 @@ export class HookManager {
       icon: HookManager.getItemSheetHeaderButtonIcon(item),
       label: 'Identifiable',
       onclick: async () => {
-        await SystemManager.getIdentifiable().setIdentifiable(item, !SystemManager.getIdentifiable().isIdentifiable(item));
+        await provider.getIdentifiable().setIdentifiable(item, !provider.getIdentifiable().isIdentifiable(item));
         document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable i`).forEach(icon => {
           icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
         });
@@ -99,7 +95,7 @@ export class HookManager {
       document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable:not(.${staticValues.moduleName}-has-context-listener)`).forEach(element => {
         element.classList.add(`${staticValues.moduleName}-has-context-listener`);
         element.addEventListener('contextmenu', async () => {
-          await SystemManager.getIdentifiable().setIdentifiable(item, null);
+          await provider.getIdentifiable().setIdentifiable(item, null);
           element.querySelectorAll(`:scope i`).forEach(icon => {
             icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
           });
@@ -109,10 +105,10 @@ export class HookManager {
   }
 
   private static getItemSheetHeaderButtonIcon(item: Item<any>): string {
-    if (SystemManager.getIdentifiable().isManuallySet(item)) {
-      return SystemManager.getIdentifiable().isIdentifiable(item) ? 'fas fa-check' : 'fas fa-times';
+    if (provider.getIdentifiable().isManuallySet(item)) {
+      return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check' : 'fas fa-times';
     } else {
-      return SystemManager.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
+      return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
     }
   }
 
