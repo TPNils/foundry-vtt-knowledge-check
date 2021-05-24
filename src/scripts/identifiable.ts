@@ -109,7 +109,7 @@ export class Identifiable {
     if (value == null) {
       await item.unsetFlag(staticValues.moduleName, 'revealed');
     } else {
-      //await item.setFlag(staticValues.moduleName, 'revealed', value);
+      await item.setFlag(staticValues.moduleName, 'revealed', value);
     }
   }
 
