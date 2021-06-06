@@ -1,13 +1,13 @@
 <div 
   class="knowledge-check identifiable-abilities"
-  style="display: grid; grid-template-columns: max-content auto max-content; align-items: baseline;">
+  style="display: grid; grid-template-columns: fit-content(30px) auto min-content; align-items: baseline;">
   {{#each items as |itemData key|}}
-    <div style="width: 30px; height: 30px; margin-right: 4px; align-self: center;">
+    <div class="{{#if itemData.showHtmlDescription}}knowledge-check-toggle-description{{/if}}" style="width: 30px; height: 30px; margin-right: 4px; align-self: center; {{#if itemData.showHtmlDescription}}cursor: pointer;{{/if}}">
       {{#if itemData.showImg}}
         <img src="{{itemData.img}}" />
       {{/if}}
     </div>
-    <div style="flex-grow: 1;">{{itemData.name}}</div>
+    <div class="{{#if itemData.showHtmlDescription}}knowledge-check-toggle-description{{/if}}" style="{{#if itemData.showHtmlDescription}}cursor: pointer;{{/if}}">{{itemData.name}}</div>
     <label style="align-items: center; display: flex; align-self: center; {{#if itemData.revealed}}color: green;{{else}}color: red;{{/if}} {{#unless itemData.disabled}}cursor: pointer;{{/unless}}">
       <input class="knowledge-check identifiable" type="checkbox" data-actor-id="{{itemData.actorId}}" data-owned-item-id="{{itemData.ownedItemId}}" {{#if itemData.checked}}checked{{/if}} {{#if itemData.disabled}}disabled{{/if}}/>
       {{#if itemData.revealed}}
@@ -15,6 +15,11 @@
       {{else}}
         reveal
       {{/if}}
-      </label>
+    </label>
+    {{#if itemData.showHtmlDescription}}
+      <div class="knowledge-check-description" style="grid-column: span 3; display: none;">
+        {{{itemData.htmlDescription}}}
+      </div>
+    {{/if}}
   {{/each}}
 </div>

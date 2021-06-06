@@ -56,6 +56,7 @@ export class HookManager {
             ability.disabled = true;
             if (ability.ownedItemId === ownedItemId) {
               ability.showImg = event.target.checked;
+              ability.showHtmlDescription = event.target.checked;
               ability.checked = event.target.checked;
               // Do not set as revealed,
               // checked but not revealed implies that the user selected it in that message
@@ -67,7 +68,49 @@ export class HookManager {
         }
       }
   
-    })
+    });
+
+    const clickedOnClass = (event: Event, className: string) => {
+      let target = event.target as HTMLElement;
+      do {
+        if (target.classList.contains(className)) {
+          return target;
+        } else {
+          target = target.parentNode as HTMLElement;
+        }
+      } while (target.parentNode)
+
+      return null;
+    }
+
+    // Add a listener to show the description of revealed abilities
+    document.querySelector('#chat').addEventListener('click', async event => {
+      if (event.target instanceof HTMLElement) {
+        const matchedElement = clickedOnClass(event, 'knowledge-check-toggle-description');
+        if (matchedElement) {
+          let descriptionElement: HTMLElement;
+          let currentElement = matchedElement;
+          // The next (max)5 or so elements should be the description
+          for (let i = 0; i < 5; i++) {
+            currentElement = currentElement.nextElementSibling as HTMLElement;
+            if (currentElement.classList.contains('knowledge-check-description')) {
+              descriptionElement = currentElement;
+              break;
+            }
+          }
+
+          if (!descriptionElement) {
+            return;
+          }
+
+          if (descriptionElement.style.display === 'none') {
+            descriptionElement.style.display = 'block';
+          } else {
+            descriptionElement.style.display = 'none';
+          }
+        }
+      }
+    });
   }
 
   private static socketlibReady(): void {

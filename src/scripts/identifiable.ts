@@ -1,12 +1,13 @@
 import { provider } from "./provider.js";
 import { staticValues } from "./static-values.js";
-import { ValueProvider } from "./value-provider.js";
 
 export interface IdentifiableAbility {
   actorId: string;
   ownedItemId: string;
   name: string;
   img: string;
+  htmlDescription: string;
+  showHtmlDescription: boolean;
   showImg: boolean;
   revealed: boolean;
   checked: boolean;
@@ -127,6 +128,8 @@ export class Identifiable {
         ownedItemId: item.id,
         name: item.name,
         img: item.img,
+        htmlDescription: item.data?.data?.description?.value ? item.data.data.description.value : '',
+        showHtmlDescription: isRevealed,
         showImg: isRevealed,
         revealed: isRevealed,
         checked: isRevealed,
