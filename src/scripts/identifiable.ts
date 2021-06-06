@@ -7,6 +7,7 @@ export interface IdentifiableAbility {
   ownedItemId: string;
   name: string;
   img: string;
+  showImg: boolean;
   revealed: boolean;
   checked: boolean;
   disabled: boolean;
@@ -126,6 +127,7 @@ export class Identifiable {
         ownedItemId: item.id,
         name: item.name,
         img: item.img,
+        showImg: isRevealed,
         revealed: isRevealed,
         checked: isRevealed,
         disabled: isRevealed,

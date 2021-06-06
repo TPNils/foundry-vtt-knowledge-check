@@ -2,7 +2,11 @@
   class="knowledge-check identifiable-abilities"
   style="display: grid; grid-template-columns: max-content auto max-content; align-items: baseline;">
   {{#each items as |itemData key|}}
-    <img src="{{itemData.img}}" style="width: 30px; height: 30px; margin-right: 4px; align-self: center;"/>
+    <div style="width: 30px; height: 30px; margin-right: 4px; align-self: center;">
+      {{#if itemData.showImg}}
+        <img src="{{itemData.img}}" />
+      {{/if}}
+    </div>
     <div style="flex-grow: 1;">{{itemData.name}}</div>
     <label style="align-items: center; display: flex; align-self: center; {{#if itemData.revealed}}color: green;{{else}}color: red;{{/if}} {{#unless itemData.disabled}}cursor: pointer;{{/unless}}">
       <input class="knowledge-check identifiable" type="checkbox" data-actor-id="{{itemData.actorId}}" data-owned-item-id="{{itemData.ownedItemId}}" {{#if itemData.checked}}checked{{/if}} {{#if itemData.disabled}}disabled{{/if}}/>
