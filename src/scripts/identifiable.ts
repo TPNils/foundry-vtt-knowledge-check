@@ -7,12 +7,25 @@ export interface IdentifiableAbility {
   name: string;
   img: string;
   htmlDescription: string;
+  hideOriginalName: boolean;
+  unidentifiedName: string;
   showHtmlDescription: boolean;
   showImg: boolean;
   revealed: boolean;
   checked: boolean;
   disabled: boolean;
 }
+
+export interface IdentifiableItemSetting {
+  isIdentifiable: boolean;
+  isIdentified: boolean;
+  unidentifiedName?: string;
+}
+
+export type ItemId = Item | {
+  actorId?: string;
+  itemId: string;
+};
 
 export class Identifiable {
 
@@ -21,97 +34,46 @@ export class Identifiable {
     socket.register('setRevealed', this.setRevealedLocal.bind(this));
   }
 
-  public isIdentifiable(item: Item<any>): boolean {
-    const isIdentifiable = item.getFlag(staticValues.moduleName, 'identifiable');
-    if (isIdentifiable == null) {
-      // fallback for dnd5e
-      if (item.type === 'spell') {
-        // what spells the character knows is still a secret and are usualy vanilla dnd spells
-        return false;
-      }
-      if (item.type === 'weapon' || item.type === 'equipment' || item.type === 'feat') {
-        if (item.data.data?.activation?.type != null && item.data.data?.activation?.type !== '') {
-          return true;
-        } else {
-          return false;
-        }
-      }
-      
-      // (as fallback) Don't show the following
-      // consumable, tool, loot, class, backpack
-      return false;
+  public getItemSettings(itemId: ItemId): IdentifiableItemSetting {
+    const item = this.getItem(itemId);
+    const storedSettings: Partial<IdentifiableItemSetting> = item.getFlag(staticValues.moduleName, 'identifiable');
+    console.log(item.name, storedSettings);
+    const resultSettings: IdentifiableItemSetting = {
+      isIdentifiable: storedSettings?.isIdentifiable === true,
+      isIdentified: storedSettings?.isIdentified === true
+    };
+    if (storedSettings?.unidentifiedName != null) {
+      resultSettings.unidentifiedName = storedSettings.unidentifiedName;
     }
-    
-    switch (typeof isIdentifiable) {
-      case 'boolean':
-        return isIdentifiable;
-      case 'bigint':
-      case 'number':
-        return isIdentifiable > 0;
-      case 'string':
-        if ('true' === isIdentifiable.toLowerCase()) {
-          return true;
-        }
-        if ('false' === isIdentifiable.toLowerCase()) {
-          return false;
-        }
-        /* falls through */
-      default: 
-        return !!isIdentifiable;
-    }
+    return resultSettings;
   }
 
-  public isManuallySet(item: Item<any>): boolean {
-    return item.getFlag(staticValues.moduleName, 'identifiable') == null;
-  }
-
-  public async setIdentifiable(item: Item<any>, value: boolean | null): Promise<void> {
+  public async setItemSettings(itemId: ItemId, value: IdentifiableItemSetting): Promise<void> {
+    const item = this.getItem(itemId);
     if (value == null) {
       await item.unsetFlag(staticValues.moduleName, 'identifiable');
     } else {
       await item.setFlag(staticValues.moduleName, 'identifiable', value);
-    }
-
-    // Reset reveal, a 'it works well enough' solution to allow to reset something that was revealed
-    if (!value) {
-      const isRevealed = item.getFlag(staticValues.moduleName, 'revealed');
-      if (isRevealed != null) {
-        await this.setRevealed(item, null);
-      }
+      console.log({
+        set: value,
+        read: item.data.flags
+      });
     }
   }
 
-  public isRevealed(item: Item<any>): boolean {
-    const isRevealed = item.getFlag(staticValues.moduleName, 'revealed');
-    
-    switch (typeof isRevealed) {
-      case 'boolean':
-        return isRevealed;
-      case 'bigint':
-      case 'number':
-        return isRevealed > 0;
-      case 'string':
-        if ('true' === isRevealed.toLowerCase()) {
-          return true;
-        }
-        if ('false' === isRevealed.toLowerCase()) {
-          return false;
-        }
-        /* falls through */
-      default: 
-        return !!isRevealed;
-    }
-  }
-
-  public async setRevealed(item: Item<any>, value: boolean | null): Promise<void> {
+  public async setRevealed(item: Item<any>, value: boolean): Promise<void> {
     const socket = await provider.getSocket();
     return await socket.executeAsGM('setRevealed', item.actor.id, item.id, value);
   }
 
-  private async setRevealedLocal(actorId: string, itemId: string, value: boolean | null): Promise<void> {
+  private async setRevealedLocal(actorId: string, itemId: string, value: boolean): Promise<void> {
     const item = game.actors.get(actorId).items.get(itemId);
-    if (value == null) {
-      await item.unsetFlag(staticValues.moduleName, 'revealed');
+    const itemSettings = this.getItemSettings(item);
+    if (itemSettings.isIdentifiable) {
+      await this.setItemSettings(item, {
+        ...itemSettings,
+        isIdentified: value
+      });
     } else {
       await item.setFlag(staticValues.moduleName, 'revealed', value);
     }
@@ -121,21 +83,30 @@ export class Identifiable {
     const actor = game.actors.get(actorId);
 
     return Array.from(actor.items)
-      .filter(item => this.isIdentifiable(item))
-      .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
-      .map((item: Item<any>) => {
-        const isRevealed = this.isRevealed(item);
+      .map(item => {
+        const itemSettings = this.getItemSettings(item);
+        return {
+          item: item,
+          name: !itemSettings.isIdentified && itemSettings.unidentifiedName ? itemSettings.unidentifiedName : item.name,
+          settings: itemSettings
+        };
+      })
+      .filter(item => item.settings.isIdentifiable)
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((item) => {
         return {
           actorId: actorId,
-          ownedItemId: item.id,
+          ownedItemId: item.item.id,
           name: item.name,
-          img: item.img,
-          htmlDescription: item.data?.data?.description?.value ? item.data.data.description.value : '',
-          showHtmlDescription: isRevealed,
-          showImg: isRevealed,
-          revealed: isRevealed,
-          checked: isRevealed,
-          disabled: isRevealed,
+          img: item.item.img,
+          htmlDescription: item.item.data?.data?.description?.value ? item.item.data.data.description.value : '',
+          hideOriginalName: !item.settings.isIdentified && item.settings.unidentifiedName != null,
+          unidentifiedName: item.settings.unidentifiedName,
+          showHtmlDescription: item.settings.isIdentified,
+          showImg: item.settings.isIdentified,
+          revealed: item.settings.isIdentified,
+          checked: item.settings.isIdentified,
+          disabled: item.settings.isIdentified,
         };
       });
   }
@@ -144,6 +115,34 @@ export class Identifiable {
     return await (renderTemplate(`modules/${staticValues.moduleName}/templates/identifiable-abilities.hbs`, {
       items: abilities
     }) as any);
+  }
+  
+  public async openSettings(item: Item): Promise<void> {
+    const itemSettings = this.getItemSettings(item);
+    const html: string = await (renderTemplate(`modules/${staticValues.moduleName}/templates/identifiable-settings.hbs`, itemSettings) as any);
+    
+    const dialog = new Dialog({
+      title: item.name,
+      content: html,
+      buttons: {
+        save: {
+          label: 'Save',
+          callback: async () => {
+            const element: HTMLElement = dialog.element instanceof HTMLElement ? dialog.element : dialog.element[0];
+            const isIdentifiable = (element.querySelector(':scope #knowledge-check-is-identifiable') as HTMLInputElement).checked;
+            const isIdentified = (element.querySelector(':scope #knowledge-check-is-identified') as HTMLInputElement).checked;
+            const unidentifiedName = (element.querySelector(':scope #knowledge-check-unidentified-name') as HTMLInputElement).value;
+            this.setItemSettings(item, {
+              isIdentifiable: isIdentifiable,
+              isIdentified: isIdentified,
+              unidentifiedName: unidentifiedName == null || unidentifiedName.length === 0 ? undefined : unidentifiedName
+            });
+            dialog.close();
+          }
+        }
+      },
+    });
+    dialog.render(true);
   }
   
   public async printAbilities(actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
@@ -190,6 +189,20 @@ export class Identifiable {
       });
     }
 
+  }
+
+  private getItem(itemId: ItemId): Item {
+    if (itemId instanceof Item) {
+      itemId = {
+        itemId: itemId.id,
+        actorId: itemId.actor?.id
+      };
+    }
+    if (itemId.actorId) {
+      return game.actors.get(itemId.actorId).items.get(itemId.itemId);
+    } else {
+      return game.items.get(itemId.itemId);
+    }
   }
 
 }

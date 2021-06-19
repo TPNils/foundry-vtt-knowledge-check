@@ -56,6 +56,7 @@ export class HookManager {
             ability.disabled = true;
             if (ability.ownedItemId === ownedItemId) {
               ability.showImg = event.target.checked;
+              ability.hideOriginalName = !event.target.checked;
               ability.showHtmlDescription = event.target.checked;
               ability.checked = event.target.checked;
               // Do not set as revealed,
@@ -127,29 +128,30 @@ export class HookManager {
       icon: HookManager.getItemSheetHeaderButtonIcon(item),
       label: 'Identifiable',
       onclick: async () => {
-        await provider.getIdentifiable().setIdentifiable(item, !provider.getIdentifiable().isIdentifiable(item));
+        const currentSettings = provider.getIdentifiable().getItemSettings(item);
+        await provider.getIdentifiable().setItemSettings(item, {
+          ...currentSettings,
+          isIdentifiable: !currentSettings.isIdentifiable
+        });
         document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable i`).forEach(icon => {
           icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
         });
       }
     });
 
-    // reset with right click
+    // open settings with right click
     setTimeout(() => {
       document.querySelectorAll(`.${staticValues.moduleName}-toggle-identifiable:not(.${staticValues.moduleName}-has-context-listener)`).forEach(element => {
         element.classList.add(`${staticValues.moduleName}-has-context-listener`);
         element.addEventListener('contextmenu', async () => {
-          await provider.getIdentifiable().setIdentifiable(item, null);
-          element.querySelectorAll(`:scope i`).forEach(icon => {
-            icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
-          });
+          provider.getIdentifiable().openSettings(item);
         });
       });
     }, 500);
   }
 
   private static getItemSheetHeaderButtonIcon(item: Item<any>): string {
-    return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
+    return provider.getIdentifiable().getItemSettings(item).isIdentifiable ? 'fas fa-check-circle' : 'fas fa-times-circle';
   }
 
 }

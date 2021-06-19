@@ -7,7 +7,13 @@
         <img src="{{itemData.img}}" />
       {{/if}}
     </div>
-    <div class="{{#if itemData.showHtmlDescription}}knowledge-check-toggle-description{{/if}}" style="{{#if itemData.showHtmlDescription}}cursor: pointer;{{/if}}">{{itemData.name}}</div>
+    <div class="{{#if itemData.showHtmlDescription}}knowledge-check-toggle-description{{/if}}" style="{{#if itemData.showHtmlDescription}}cursor: pointer;{{/if}}">
+      {{#if itemData.hideOriginalName}}
+        {{itemData.unidentifiedName}}
+      {{else}}
+        {{itemData.name}}
+      {{/if}}
+    </div>
     <label style="align-items: center; display: flex; align-self: center; {{#if itemData.revealed}}color: green;{{else}}color: red;{{/if}} {{#unless itemData.disabled}}cursor: pointer;{{/unless}}">
       <input class="knowledge-check identifiable" type="checkbox" data-actor-id="{{itemData.actorId}}" data-owned-item-id="{{itemData.ownedItemId}}" {{#if itemData.checked}}checked{{/if}} {{#if itemData.disabled}}disabled{{/if}}/>
       {{#if itemData.revealed}}
