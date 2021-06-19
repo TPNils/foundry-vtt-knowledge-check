@@ -106,10 +106,15 @@ export class Identifiable {
       });
   }
 
-  public async getAbilitiesHtml(abilities: IdentifiableAbility[]): Promise<string> {
-    return await (renderTemplate(`modules/${staticValues.moduleName}/templates/identifiable-abilities.hbs`, {
+  public async getAbilitiesHtml(abilities: IdentifiableAbility[], options: {enrich?: { secrets: boolean, entities: boolean, links: boolean, rolls: boolean, rollData: boolean }} = {}): Promise<string> {
+    const html: string = await (renderTemplate(`modules/${staticValues.moduleName}/templates/identifiable-abilities.hbs`, {
       items: abilities
     }) as any);
+    if (options.enrich) {
+      return TextEditor.enrichHTML(html, options.enrich);
+    } else {
+      return TextEditor.enrichHTML(html);
+    }
   }
   
   public async openSettings(item: Item): Promise<void> {
