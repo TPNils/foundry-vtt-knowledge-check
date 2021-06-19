@@ -134,7 +134,7 @@ export class Identifiable {
             this.setItemSettings(item, {
               isIdentifiable: isIdentifiable,
               isIdentified: isIdentified,
-              unidentifiedName: unidentifiedName == null || unidentifiedName.length === 0 ? undefined : unidentifiedName
+              unidentifiedName: unidentifiedName == null || unidentifiedName.length === 0 ? '' : unidentifiedName
             });
             dialog.close();
           }
