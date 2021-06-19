@@ -1,4 +1,4 @@
-<form style="display: grid; grid-template-columns: max-content auto; align-items: baseline;">
+<div style="display: grid; grid-template-columns: max-content auto; align-items: baseline;">
   <label for="knowledge-check-is-identifiable">Identifiable</label>
   <input type="checkbox" name="is-identifiable" id="knowledge-check-is-identifiable" {{#if isIdentifiable}}checked{{/if}}/>
 
@@ -7,4 +7,4 @@
   
   <label for="knowledge-check-unidentified-name">Unidentified name</label>
   <input type="text" name="unidentified-name" id="knowledge-check-unidentified-name" {{#if unidentifiedName}}value="{{unidentifiedName}}"{{/if}}/>
-</form>
+</div>
