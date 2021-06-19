@@ -37,7 +37,6 @@ export class Identifiable {
   public getItemSettings(itemId: ItemId): IdentifiableItemSetting {
     const item = this.getItem(itemId);
     const storedSettings: Partial<IdentifiableItemSetting> = item.getFlag(staticValues.moduleName, 'identifiable');
-    console.log(item.name, storedSettings);
     const resultSettings: IdentifiableItemSetting = {
       isIdentifiable: storedSettings?.isIdentifiable === true,
       isIdentified: storedSettings?.isIdentified === true
@@ -54,10 +53,6 @@ export class Identifiable {
       await item.unsetFlag(staticValues.moduleName, 'identifiable');
     } else {
       await item.setFlag(staticValues.moduleName, 'identifiable', value);
-      console.log({
-        set: value,
-        read: item.data.flags
-      });
     }
   }
 
