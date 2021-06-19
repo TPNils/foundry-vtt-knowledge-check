@@ -82,17 +82,16 @@ export class Identifiable {
         const itemSettings = this.getItemSettings(item);
         return {
           item: item,
-          name: !itemSettings.isIdentified && itemSettings.unidentifiedName ? itemSettings.unidentifiedName : item.name,
           settings: itemSettings
         };
       })
       .filter(item => item.settings.isIdentifiable)
-      .sort((a, b) => a.name.localeCompare(b.name))
+      .sort((a, b) => a.item.name.localeCompare(b.item.name))
       .map((item) => {
         return {
           actorId: actorId,
           ownedItemId: item.item.id,
-          name: item.name,
+          name: item.item.name,
           img: item.item.img,
           htmlDescription: item.item.data?.data?.description?.value ? item.item.data.data.description.value : '',
           hideOriginalName: !item.settings.isIdentified && item.settings.unidentifiedName != null,
