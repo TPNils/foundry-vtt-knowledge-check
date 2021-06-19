@@ -2,7 +2,7 @@
  * Allow to request a value before it may have been initialized, queueing the requests if the value is missing
  */
 export class ValueProvider<T> {
-  private valueProvided: boolean = false;
+  private valueProvided = false;
   private value: T;
   private queue: Array<(value?: T) => void> = [];
 
@@ -10,7 +10,7 @@ export class ValueProvider<T> {
     if (this.valueProvided) {
       return new Promise((resolve) => {
         resolve(this.value);
-      })
+      });
     } else {
       return new Promise((resolve) => {
         // I believe, in theory, the value could be set before this callback function is executed
@@ -19,12 +19,12 @@ export class ValueProvider<T> {
         } else {
           this.queue.push(resolve);
         }
-      })
+      });
     }
   }
 
   public getSync(): T {
-    return this.value
+    return this.value;
   }
 
   public isSet(): boolean {

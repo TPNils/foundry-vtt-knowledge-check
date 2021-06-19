@@ -8,6 +8,7 @@
 !/README.md
 !/lib-find-the-path
 !/.gitmodules
+!/.eslintrc.json
 
 !/src
 /src/*

@@ -1,6 +1,6 @@
 const staticValues = {
-  moduleName: "knowledge-check",
-  moduleLabel: "Knowledge check",
+  moduleName: 'knowledge-check',
+  moduleLabel: 'Knowledge check',
 };
 
 Object.freeze(staticValues);

@@ -1,5 +1,5 @@
-import { staticValues } from "./static-values.js";
-import { provider } from "./provider.js";
+import { staticValues } from './static-values.js';
+import { provider } from './provider.js';
 
 interface ItemSheetHeaderButton {
   class: string;
@@ -13,7 +13,7 @@ export class HookManager {
     Hooks.on('getItemSheetHeaderButtons', (...args: any) => HookManager.getItemSheetHeaderButtons(args[0], args[1]));
     Hooks.on('init', () => HookManager.init());
     Hooks.on('ready', () => HookManager.ready());
-    Hooks.once("socketlib.ready", () => HookManager.socketlibReady());
+    Hooks.once('socketlib.ready', () => HookManager.socketlibReady());
   }
 
   private static init(): void {
@@ -78,10 +78,10 @@ export class HookManager {
         } else {
           target = target.parentNode as HTMLElement;
         }
-      } while (target.parentNode)
+      } while (target.parentNode);
 
       return null;
-    }
+    };
 
     // Add a listener to show the description of revealed abilities
     document.querySelector('#chat').addEventListener('click', async event => {
@@ -132,7 +132,7 @@ export class HookManager {
           icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
         });
       }
-    })
+    });
 
     // reset with right click
     setTimeout(() => {
@@ -143,17 +143,13 @@ export class HookManager {
           element.querySelectorAll(`:scope i`).forEach(icon => {
             icon.className = HookManager.getItemSheetHeaderButtonIcon(item);
           });
-        })
+        });
       });
     }, 500);
   }
 
   private static getItemSheetHeaderButtonIcon(item: Item<any>): string {
-    if (provider.getIdentifiable().isManuallySet(item)) {
-      return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check' : 'fas fa-times';
-    } else {
-      return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
-    }
+    return provider.getIdentifiable().isIdentifiable(item) ? 'fas fa-check-circle' : 'fas fa-times-circle';
   }
 
 }

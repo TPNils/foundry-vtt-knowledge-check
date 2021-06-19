@@ -1,12 +1,12 @@
-import { Identifiable } from "./identifiable.js";
-import { ValueProvider } from "./value-provider.js";
+import { Identifiable } from './identifiable.js';
+import { ValueProvider } from './value-provider.js';
 
 class Provider {
 
   constructor() {
     this.socket.get().then(socket => {
       this.getIdentifiable().registerSocket(socket);
-    })
+    });
   }
 
   private identifiable = new ValueProvider<Identifiable>();

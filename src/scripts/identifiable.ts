@@ -1,5 +1,5 @@
-import { provider } from "./provider.js";
-import { staticValues } from "./static-values.js";
+import { provider } from './provider.js';
+import { staticValues } from './static-values.js';
 
 export interface IdentifiableAbility {
   actorId: string;
@@ -55,6 +55,7 @@ export class Identifiable {
         if ('false' === isIdentifiable.toLowerCase()) {
           return false;
         }
+        /* falls through */
       default: 
         return !!isIdentifiable;
     }
@@ -96,6 +97,7 @@ export class Identifiable {
         if ('false' === isRevealed.toLowerCase()) {
           return false;
         }
+        /* falls through */
       default: 
         return !!isRevealed;
     }
@@ -119,23 +121,23 @@ export class Identifiable {
     const actor = game.actors.get(actorId);
 
     return Array.from(actor.items)
-    .filter(item => this.isIdentifiable(item))
-    .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
-    .map((item: Item<any>) => {
-      const isRevealed = this.isRevealed(item);
-      return {
-        actorId: actorId,
-        ownedItemId: item.id,
-        name: item.name,
-        img: item.img,
-        htmlDescription: item.data?.data?.description?.value ? item.data.data.description.value : '',
-        showHtmlDescription: isRevealed,
-        showImg: isRevealed,
-        revealed: isRevealed,
-        checked: isRevealed,
-        disabled: isRevealed,
-      }
-    });
+      .filter(item => this.isIdentifiable(item))
+      .sort((a: Item, b: Item) => a.name.localeCompare(b.name))
+      .map((item: Item<any>) => {
+        const isRevealed = this.isRevealed(item);
+        return {
+          actorId: actorId,
+          ownedItemId: item.id,
+          name: item.name,
+          img: item.img,
+          htmlDescription: item.data?.data?.description?.value ? item.data.data.description.value : '',
+          showHtmlDescription: isRevealed,
+          showImg: isRevealed,
+          revealed: isRevealed,
+          checked: isRevealed,
+          disabled: isRevealed,
+        };
+      });
   }
 
   public async getAbilitiesHtml(abilities: IdentifiableAbility[]): Promise<string> {
@@ -161,7 +163,7 @@ export class Identifiable {
         setTimeout(() => {
           document.querySelectorAll(`[data-message-id="${message.id}"] .message-content input`).forEach((input: HTMLInputElement) => {
             input.disabled = false;
-          })
+          });
           resolve(null);
         }, 0);
       } else {
