@@ -87,7 +87,7 @@ export class Identifiable {
           name: item.item.name,
           img: item.item.img,
           htmlDescription: item.item.data?.data?.description?.value ? item.item.data.data.description.value : '',
-          hideOriginalName: !item.settings.isIdentified && item.settings.unidentifiedName != null,
+          hideOriginalName: !item.settings.isIdentified && item.settings.unidentifiedName != null && item.settings.unidentifiedName != '',
           unidentifiedName: item.settings.unidentifiedName,
           showHtmlDescription: item.settings.isIdentified,
           showImg: item.settings.isIdentified,
