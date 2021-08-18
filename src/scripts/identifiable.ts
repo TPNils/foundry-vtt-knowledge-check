@@ -31,7 +31,6 @@ export class Identifiable {
 
   public registerSocket(socket: SocketlibSocket): void {
     socket.register('updateAbilityMessage', this.updateAbilityMessageLocal.bind(this));
-    socket.register('setRevealed', this.setRevealedLocal.bind(this));
   }
 
   public getItemSettings(itemId: ItemId): IdentifiableItemSetting {
@@ -57,12 +56,6 @@ export class Identifiable {
   }
 
   public async setRevealed(item: Item<any>, value: boolean): Promise<void> {
-    const socket = await provider.getSocket();
-    return await socket.executeAsGM('setRevealed', item.actor.id, item.id, value);
-  }
-
-  private async setRevealedLocal(actorId: string, itemId: string, value: boolean): Promise<void> {
-    const item = game.actors.get(actorId).items.get(itemId);
     const itemSettings = this.getItemSettings(item);
     if (itemSettings.isIdentifiable) {
       await this.setItemSettings(item, {

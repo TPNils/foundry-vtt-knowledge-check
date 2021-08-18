@@ -59,8 +59,7 @@ export class HookManager {
               ability.hideOriginalName = !event.target.checked;
               ability.showHtmlDescription = event.target.checked;
               ability.checked = event.target.checked;
-              // Do not set as revealed,
-              // checked but not revealed implies that the user selected it in that message
+              ability.revealed = event.target.checked;
             }
           }
   
