@@ -155,19 +155,7 @@ export class Identifiable {
       user: game.userId
     });
   
-    return new Promise(resolve => {
-      if (game.user.hasRole(CONST.USER_ROLES.GAMEMASTER)) {
-        // Allow GM to 'un reveal' abilities
-        setTimeout(() => {
-          document.querySelectorAll(`[data-message-id="${message.id}"] .message-content input`).forEach((input: HTMLInputElement) => {
-            input.disabled = false;
-          });
-          resolve(null);
-        }, 0);
-      } else {
-        resolve(null);
-      }
-    });
+    this.afterMessageHtmlUpdate(message.id);
   }
 
   public async updateAbilityMessage(messageId: string, actorId: string, overrides: {abilities?: IdentifiableAbility[]} = {}): Promise<void> {
@@ -186,6 +174,8 @@ export class Identifiable {
         _id: messageId,
         content: htmlTemplate
       });
+
+      this.afterMessageHtmlUpdate(messageId);
     }
 
   }
@@ -202,6 +192,22 @@ export class Identifiable {
     } else {
       return game.items.get(itemId.itemId);
     }
+  }
+
+  private afterMessageHtmlUpdate(messageId: string): Promise<void> {
+    return new Promise(resolve => {
+      if (game.user.hasRole(CONST.USER_ROLES.GAMEMASTER)) {
+        // Allow GM to 'un reveal' abilities
+        setTimeout(() => {
+          document.querySelectorAll(`[data-message-id="${messageId}"] .message-content input`).forEach((input: HTMLInputElement) => {
+            input.disabled = false;
+          });
+          resolve(null);
+        }, 0);
+      } else {
+        resolve(null);
+      }
+    });
   }
 
 }
