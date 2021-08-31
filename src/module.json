@@ -1,7 +1,7 @@
 {
   "name": "knowledge-check",
   "title": "Knowledge check",
-  "description": "Allow players to learn about their encounter, inspired by twitch dnd streamer Arcadum", 
+  "description": "Allow players to learn about their encounter", 
   "authors": [
     {
       "name": "TPNils"

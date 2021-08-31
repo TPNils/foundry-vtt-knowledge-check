@@ -1,7 +1,7 @@
 {
   "name": "knowledge-check",
   "version": "1.0.0",
-  "description": "Allow players to learn about their encounter, inspired by twitch dnd streamer Arcadum",
+  "description": "Allow players to learn about their encounter",
   "main": "index.js",
   "scripts": {
     "build": "gulp build",
